@@ -1,0 +1,17 @@
+{
+  "name": "sakuno-bot",
+  "version": "1.0.0",
+  "description": "bot built for the hayato discord",
+  "main": "sakuno.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/sakuno.js"
+  },
+  "author": "Erin (Bean)",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "discord.js": "^12.5.3",
+    "dotenv": "^8.2.0"
+  }
+}
