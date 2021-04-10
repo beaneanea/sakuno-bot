@@ -5,7 +5,8 @@
   "main": "sakuno.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./src/sakuno.js"
+    "start": "node ./src/sakuno.js",
+    "dev": "nodemon ./src/sakuno.js"
   },
   "author": "Erin (Bean)",
   "license": "ISC",
