@@ -8,8 +8,26 @@ const PREFIX = '/';
 
 client.login(process.env.DISCORDJS_BOT_TOKEN);
 
-client.on('ready', () => {});
+// WIP
+client.on('guildMemberAdd', (member) => {
+  console.log(`a user joins a guild: ${member.tag}`);
+  const channel = member?.guild?.channels?.cache.find(r => r.name.toLowerCase() === 'general');
+  channel.send(
+    `
+    welcome ${member?.user?.username}!!\n
+    please use one of the following commands:\n
+    sakuno-gms {YOUR_IGN}\n
+    sakuno-ems {YOUR_IGN}\n
+    sakuno-kms {YOUR_IGN}\n
+    sakuno-tms {YOUR_IGN}\n
+    sakuno-cms {YOUR_IGN}\n
+    sakuno-ps {YOUR_IGN}
+    `
+  );
+  console.log(channel);
+});
 
+//TODO: add help command and error messages
 client.on('message', async (message) => {
   if (message?.author?.bot) return;
   if (message?.content?.startsWith(PREFIX)) {
@@ -19,15 +37,32 @@ client.on('message', async (message) => {
       .substring(PREFIX.length)
       .split(/\s+/);
     
-    if (is_valid_command(command, args, 1) && command === 'sakuno-gms') {
-      const ign = args[0];
-      const server_name = 'gms';
-
-      if (await verify_hayato(ign, server_name)) {
-        const role = message.guild.roles.cache.find(r => r.name.toLowerCase() === server_name);
-        const member = message?.guild?.members?.cache.get(message?.author?.id);
-        member.roles.add(role).then((res) => console.log(res?.data)).catch(console.error);
-      }
+    if (!is_valid_command(command, args)) return;
+    let char_info = undefined;
+    
+    switch (command) {
+      case 'sakuno-gms': 
+        char_info = await verify_hayato(args[0], 'gms');
+        if (char_info) add_role(message, char_info?.server);
+        break;
+      case 'sakuno-ems':
+        char_info = await verify_hayato(args[0], 'ems');
+        if (char_info) add_role(message, char_info?.server);
+        break;
+      case 'sakuno-ps':
+        add_role(message, 'Private Server');
+        break;
+      case 'sakuno-cms':
+        add_role(message, 'CMS');
+        break;
+      case 'sakuno-kms':
+        add_role(message, 'KMS');
+        break;
+      case 'sakuno-tms':
+        add_role(message, 'TMS');
+        break;
+      default:
+        message.channel.send('invalid command ;-;');
     }
   } 
 });
@@ -41,17 +76,9 @@ const verify_hayato = async (ign, server) => {
       server: response?.data?.Server,
       name: response?.data?.Name,
     };
-    if (relevant_info.job === 'Hayato') {
-      // assign roles and name
-      return true;
-    } else {
-      // post message in channel saying there was an error
-      console.log(`oh no ${error}`);
-      return false;
-    }
+    return relevant_info.job === 'Hayato' && relevant_info;
   } catch (err) {
-    // post message in channel saying there was an error
-    console.log(`oh no ${error}`);
+    console.log(error);
     return false;
   }
 }
@@ -59,9 +86,18 @@ const verify_hayato = async (ign, server) => {
 const is_valid_command = (
   command,
   args,
-  expected_num_args
   ) => {
-  return typeof command === 'string' && Array.isArray(args) && args.length === expected_num_args;
-}
+  return typeof command === 'string' && Array.isArray(args);
+};
+
+// TODO: add map to translate from gg server id to role name
+const add_role = (msg, role_name) => {
+  const role = msg.guild.roles.cache.find(r => r.name.toLowerCase() === role_name);
+  const member = msg?.guild?.members?.cache.get(msg?.author?.id);
+  member.roles.add(role).then((res) => console.log(res?.data)).catch(console.error);
+};
+
+// TODO: everything... :)
+const assign_name = (msg, ign) => {};
 
 verify_hayato('beanary', 'gms');
